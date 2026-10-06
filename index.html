@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Golden Arcade</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#080808;color:#fff}
+:root{--gold:#f5c542;--dark:#111;--card:#171717}
+header{padding:22px 18px;text-align:center;border-bottom:1px solid #3d3215;background:linear-gradient(#111,#090909)}
+.logo{font-size:28px;font-weight:900;color:var(--gold);letter-spacing:2px}.sub{color:#aaa;margin-top:5px}
+.balance{margin:14px auto 0;display:inline-block;background:#151515;border:1px solid #6d571b;border-radius:20px;padding:9px 16px;color:var(--gold);font-weight:bold}
+nav{display:flex;gap:8px;overflow:auto;padding:12px;background:#0d0d0d;position:sticky;top:0;z-index:5}
+nav button{white-space:nowrap;background:#191919;color:#ddd;border:1px solid #393939;border-radius:12px;padding:10px 13px}
+nav button.active,button.gold{background:var(--gold);color:#111;border-color:var(--gold);font-weight:800}
+main{max-width:1000px;margin:auto;padding:18px}.screen{display:none}.screen.active{display:block}
+.hero{padding:25px;border:1px solid #403517;border-radius:20px;background:radial-gradient(circle at 50% 0,#2b2411,#151515 50%);text-align:center}
+.hero h1{font-size:32px;margin:5px 0;color:var(--gold)}.hero p{color:#bbb}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:18px}
+.card{background:var(--card);border:1px solid #292929;border-radius:18px;padding:18px}.card h3{margin-top:0;color:var(--gold)}
+.game{margin-top:15px;text-align:center;background:#121212;border:1px solid #332b18;border-radius:20px;padding:22px}
+.big{font-size:70px;margin:18px 0}.result{min-height:28px;color:#ddd;font-weight:bold}
+.controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+button{cursor:pointer;border-radius:11px;padding:11px 15px;border:1px solid #555;background:#242424;color:#fff;font-weight:bold}
+button:active{transform:scale(.97)}
+.slots{display:flex;justify-content:center;gap:8px}.reel{width:85px;height:85px;display:grid;place-items:center;background:#222;border:2px solid #7c641c;border-radius:15px;font-size:42px}
+.cups{display:flex;justify-content:center;gap:15px;margin:25px 0}.cup{font-size:58px;background:#222;border:1px solid #555;border-radius:15px;padding:18px 13px}.cup:hover{border-color:var(--gold)}
+.chicken{font-size:80px}.meter{height:15px;background:#292929;border-radius:10px;overflow:hidden;margin:15px auto;max-width:400px}.meter i{display:block;height:100%;width:0;background:var(--gold);transition:.15s}
+.stat{display:flex;justify-content:space-between;border-bottom:1px solid #292929;padding:10px 0;color:#bbb}.stat b{color:#fff}
+footer{text-align:center;color:#666;padding:30px}
+.note{font-size:13px;color:#888;margin-top:15px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">✦ GOLDEN ARCADE ✦</div>
+  <div class="sub">Аркадні ігри • тільки віртуальні очки</div>
+  <div class="balance">⭐ Очки: <span id="balance">1000</span></div>
+</header>
+<nav id="nav">
+<button class="active" data-go="home">Головна</button>
+<button data-go="chicken">🐔 Chicken Hut</button>
+<button data-go="block">⛏️ Block World</button>
+<button data-go="slots">🎰 Slots</button>
+<button data-go="crush">💥 Crush</button>
+<button data-go="cups">🥤 Стаканчики</button>
+<button data-go="wheel">🎡 Wheel</button>
+<button data-go="stats">🏆 Статистика</button><button data-go="admin">⚙️ Адмін</button>
+</nav>
+<main>
+<section id="home" class="screen active">
+<div class="hero"><h1>Ласкаво просимо</h1><p>Обирай гру та набирай очки. Жодних реальних ставок або грошових призів.</p></div>
+<div class="grid">
+<div class="card"><h3>🐔 Chicken Hut</h3><p>Лови курочку та набирай очки.</p><button class="gold" data-go="chicken">Грати</button></div>
+<div class="card"><h3>⛏️ Block World</h3><p>Збирай блоки у маленькому кубічному світі.</p><button class="gold" data-go="block">Грати</button></div>
+<div class="card"><h3>🎰 Slots</h3><p>Крути символи та отримуй бонусні очки.</p><button class="gold" data-go="slots">Грати</button></div>
+<div class="card"><h3>💥 Crush</h3><p>Натискай кнопку якомога швидше.</p><button class="gold" data-go="crush">Грати</button></div>
+<div class="card"><h3>🥤 Стаканчики</h3><p>Знайди захований символ.</p><button class="gold" data-go="cups">Грати</button></div>
+</div>
+</section>
+
+<section id="chicken" class="screen"><div class="game"><h2>🐔 Chicken Hut</h2><div class="chicken" id="chickenEmoji">🐔</div><p>Натисни на курочку!</p><button class="gold" onclick="catchChicken()">ЛОВИТИ</button><div class="result" id="chickenMsg"></div></div></section>
+
+<section id="block" class="screen"><div class="game"><h2>⛏️ Block World</h2><div class="big" id="blockEmoji">🟫</div><p>Добувай блоки та збирай ресурси.</p><button class="gold" onclick="mine()">⛏️ Копати</button><div class="result" id="blockMsg"></div></div></section>
+
+<section id="slots" class="screen"><div class="game"><h2>🎰 Slots</h2><div class="slots"><div class="reel" id="r1">🍒</div><div class="reel" id="r2">⭐</div><div class="reel" id="r3">💎</div></div><br><button class="gold" onclick="spin()">КРУТИТИ</button><div class="result" id="slotMsg"></div><div class="note">Без ставок: кожне обертання безкоштовне.</div></div></section>
+
+<section id="crush" class="screen"><div class="game"><h2>💥 Crush</h2><p>Натискай кнопку протягом 5 секунд. Кожне натискання = очко.</p><div class="big" id="crushScore">0</div><button class="gold" id="crushBtn" onclick="crush()">START</button><div class="result" id="crushMsg"></div></div></section>
+
+<section id="cups" class="screen"><div class="game"><h2>🥤 Стаканчики</h2><p>Запам'ятай, де захована ⭐, і вибери стаканчик.</p><div class="cups"><button class="cup" onclick="pickCup(0)">🥤</button><button class="cup" onclick="pickCup(1)">🥤</button><button class="cup" onclick="pickCup(2)">🥤</button></div><button class="gold" onclick="newCups()">Перемішати</button><div class="result" id="cupMsg"></div></div></section>
+
+<section id="wheel" class="screen"><div class="game"><h2>🎡 Wheel</h2><div class="big" id="wheelIcon">🎡</div><button class="gold" onclick="wheel()">КРУТИТИ КОЛЕСО</button><div class="result" id="wheelMsg"></div></div></section>
+
+<section id="stats" class="screen"><div class="game"><h2>🏆 Статистика</h2><div class="stat"><span>Очки</span><b id="sBalance">1000</b></div><div class="stat"><span>Ігор зіграно</span><b id="sGames">0</b></div><div class="stat"><span>Найкращий результат Crush</span><b id="sBest">0</b></div><br><button onclick="resetStats()">Скинути прогрес</button></div></section>
+
+<section id="admin" class="screen">
+<div class="game">
+  <h2>⚙️ Адмін-панель</h2>
+  <p id="adminStatus">Введи код адміністратора для доступу.</p>
+  <div id="adminLogin">
+    <input id="adminCode" type="password" inputmode="numeric" placeholder="Код адміністратора"
+      style="padding:12px;border-radius:10px;border:1px solid #555;background:#202020;color:white;width:min(280px,90%);margin:8px">
+    <br><button class="gold" onclick="adminLogin()">Увійти</button>
+    <div class="result" id="adminMsg"></div>
+  </div>
+
+  <div id="adminPanel" style="display:none">
+    <div class="stat"><span>Поточний баланс</span><b id="adminBalance">1000</b></div>
+    <br>
+    <input id="adminAmount" type="number" min="1" placeholder="Кількість очок"
+      style="padding:12px;border-radius:10px;border:1px solid #555;background:#202020;color:white;width:220px">
+    <div class="controls" style="margin-top:12px">
+      <button class="gold" onclick="adminAdd()">➕ Додати</button>
+      <button onclick="adminRemove()">➖ Забрати</button>
+      <button onclick="adminLogout()">Вийти</button>
+    </div>
+    <div class="result" id="adminAction"></div>
+    <div class="note">Це демонстраційна адмінка: змінюються лише віртуальні очки у браузері.</div>
+  </div>
+</div>
+</section>
+</main>
+<footer>Golden Arcade © 2026 · Віртуальні очки не мають грошової вартості.</footer>
+
+<script>
+let balance=1000,games=0,best=0,cupTarget=0,crushing=false,crushCount=0,crushTimer;
+const $=id=>document.getElementById(id);
+function update(){ $('balance').textContent=balance; $('sBalance').textContent=balance; $('sGames').textContent=games; $('sBest').textContent=best; }
+function add(n){balance+=n;games++;update();}
+function go(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.go===id));window.scrollTo(0,0)}
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+
+function catchChicken(){add(5+Math.floor(Math.random()*16));$('chickenMsg').textContent='🐔 Піймав! + очки';$('chickenEmoji').textContent=['🐔','🍗','🥚'][Math.floor(Math.random()*3)]}
+function mine(){let n=5+Math.floor(Math.random()*21);add(n);$('blockMsg').textContent='Ти добув ресурс! +'+n+' очок';$('blockEmoji').textContent=['🟫','🪨','💎','🌳'][Math.floor(Math.random()*4)]}
+const symbols=['🍒','🍋','⭐','💎','7️⃣'];
+function spin(){let a=[0,0,0];for(let i=0;i<3;i++){a[i]=symbols[Math.floor(Math.random()*symbols.length)];$('r'+(i+1)).textContent=a[i]}let n=a[0]===a[1]&&a[1]===a[2]?100:a[0]===a[1]||a[1]===a[2]||a[0]===a[2]?25:5;add(n);$('slotMsg').textContent='Результат: +'+n+' очок!'}
+function crush(){if(crushing)return;crushing=true;crushCount=0;$('crushScore').textContent=0;$('crushBtn').textContent='НАТИСКАЙ!';$('crushMsg').textContent='';crushTimer=setTimeout(()=>{crushing=false;$('crushBtn').textContent='START';if(crushCount>best)best=crushCount;balance+=crushCount;games++;update();$('crushMsg').textContent='Час! Результат: '+crushCount+' очок.'},5000);$('crushBtn').onclick=()=>{if(crushing){crushCount++;$('crushScore').textContent=crushCount}}}
+function newCups(){cupTarget=Math.floor(Math.random()*3);$('cupMsg').textContent='⭐ Сховано! Обирай.'}
+function pickCup(i){if(cupTarget===i){add(30);$('cupMsg').textContent='🎉 Правильно! +30 очок';}else{$('cupMsg').textContent='Не вгадав. Спробуй ще раз!';}newCups()}
+function wheel(){let n=[5,10,20,30,50][Math.floor(Math.random()*5)];$('wheelIcon').textContent='✨';setTimeout(()=>$('wheelIcon').textContent='🎡',500);add(n);$('wheelMsg').textContent='Колесо принесло +'+n+' очок!'}
+function resetStats(){balance=1000;games=0;best=0;update();$('crushMsg').textContent='';}
+newCups();update();
+
+const ADMIN_CODE = "2580"; // демо-код
+let adminLogged=false;
+
+function adminLogin(){
+  const code=$('adminCode').value;
+  if(code===ADMIN_CODE){
+    adminLogged=true;
+    $('adminLogin').style.display='none';
+    $('adminPanel').style.display='block';
+    $('adminStatus').textContent='✅ Адмін-доступ активний';
+    $('adminMsg').textContent='';
+    $('adminBalance').textContent=balance;
+  }else{
+    $('adminMsg').textContent='❌ Неправильний код';
+  }
+}
+function adminAdd(){
+  if(!adminLogged)return;
+  const n=Math.floor(Number($('adminAmount').value));
+  if(!n||n<1){$('adminAction').textContent='Введи кількість очок.';return}
+  balance+=n; update(); $('adminBalance').textContent=balance;
+  $('adminAction').textContent='✅ Додано '+n+' очок.';
+}
+function adminRemove(){
+  if(!adminLogged)return;
+  const n=Math.floor(Number($('adminAmount').value));
+  if(!n||n<1){$('adminAction').textContent='Введи кількість очок.';return}
+  balance=Math.max(0,balance-n); update(); $('adminBalance').textContent=balance;
+  $('adminAction').textContent='✅ Забрано '+n+' очок.';
+}
+function adminLogout(){
+  adminLogged=false;
+  $('adminLogin').style.display='block';
+  $('adminPanel').style.display='none';
+  $('adminCode').value='';
+  $('adminStatus').textContent='Введи код адміністратора для доступу.';
+}
+</script>
+</body>
+</html>
